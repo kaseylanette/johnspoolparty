@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big John's Events — Las Vegas Pool Parties</title>
+  <meta name="description" content="Las Vegas' go-to for pool parties and good times. Buy tickets, get invites, and find event addresses.">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo" onclick="showPage('home')">
+    <span class="logo-icon">🎉</span>
+    <span><span class="logo-big">Big John's</span> <span class="logo-j">Events</span></span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('home')">Home</button>
+    <button class="nav-btn" onclick="showPage('events')">Events</button>
+    <button class="nav-btn" onclick="showPage('invite')">Invite</button>
+    <button class="nav-btn" onclick="showPage('lookup')">My ticket</button>
+    <button class="nav-btn admin-btn" onclick="showPage('admin')">⚙ Admin</button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-floaters">
+      <span class="floater">🏊</span><span class="floater">🎶</span><span class="floater">🎉</span><span class="floater">🍹</span><span class="floater">🕶️</span>
+    </div>
+    <h1>Big John's Events</h1>
+    <p>Las Vegas' go-to for pool parties &amp; good times — tickets, invites, vibes</p>
+    <div class="hero-btns">
+      <button class="btn-coral" onclick="showPage('events')">Browse events</button>
+      <button class="btn-amber" onclick="showPage('lookup')">Find my address</button>
+    </div>
+  </div>
+  <div class="section">
+    <div class="stats-row">
+      <div class="stat coral"><div class="stat-num" id="stat-events">0</div><div class="stat-label">Events hosted</div></div>
+      <div class="stat amber"><div class="stat-num" id="stat-guests">0</div><div class="stat-label">Guests served</div></div>
+      <div class="stat pink"><div class="stat-num" id="stat-rating">—</div><div class="stat-label">Avg rating</div></div>
+    </div>
+    <div class="section-title">Upcoming events</div>
+    <div class="section-sub">Grab your tickets before they're gone 🔥</div>
+    <div class="events-grid" id="home-events"></div>
+  </div>
+</div>
+
+<!-- EVENTS -->
+<div id="page-events" class="page">
+  <div class="section">
+    <div class="tab-row">
+      <button class="tab active" onclick="filterEvents('upcoming',this)">Upcoming</button>
+      <button class="tab" onclick="filterEvents('past',this)">Past events</button>
+    </div>
+    <div class="events-grid" id="all-events"></div>
+  </div>
+</div>
+
+<!-- INVITE -->
+<div id="page-invite" class="page">
+  <div class="section" style="max-width:540px">
+    <div class="section-title">Send invites</div>
+    <div class="section-sub">Email or text — your crew gets all the details</div>
+    <div id="invite-form">
+      <div class="form-group">
+        <label class="form-label">Choose event</label>
+        <select class="form-input" id="invite-event"><option value="">Select an event...</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Invite via</label>
+        <div class="invite-toggle">
+          <button class="toggle-opt active" onclick="setInviteMode('email',this)">Email</button>
+          <button class="toggle-opt" onclick="setInviteMode('text',this)">Text / SMS</button>
+        </div>
+      </div>
+      <div id="email-field" class="form-group">
+        <label class="form-label">Guest email</label>
+        <div style="display:flex;gap:8px"><input class="form-input" id="invite-email" placeholder="friend@email.com" style="flex:1" onkeydown="if(event.key==='Enter')addInvite()"><button class="btn-sm coral" onclick="addInvite()">Add</button></div>
+      </div>
+      <div id="text-field" class="form-group" style="display:none">
+        <label class="form-label">Guest phone number</label>
+        <div style="display:flex;gap:8px"><input class="form-input" id="invite-phone" placeholder="(702) 555-0123" style="flex:1" onkeydown="if(event.key==='Enter')addInvite()"><button class="btn-sm coral" onclick="addInvite()">Add</button></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Personal note (optional)</label>
+        <textarea class="form-input" id="invite-note" rows="2" placeholder="Hey! Come hang with us..." oninput="updateSmsPreview()"></textarea>
+      </div>
+      <div id="sms-preview-wrap" style="display:none">
+        <div class="sms-preview">
+          <div style="font-size:11px;color:var(--amber-mid);margin-bottom:7px;font-weight:600">Text message preview</div>
+          <div class="sms-bubble" id="sms-preview-text"></div>
+        </div>
+      </div>
+      <div id="invite-chips"></div>
+      <button class="btn-full coral" style="margin-top:14px" onclick="sendInvites()">Send invites 🎉</button>
+    </div>
+    <div id="invite-success" style="display:none;text-align:center;padding:32px 0;animation:bounce-in .4s ease both">
+      <div style="font-size:52px;margin-bottom:12px">🎊</div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">Invites sent!</div>
+      <div style="font-size:14px;color:var(--text-muted)" id="invite-success-msg"></div>
+      <button class="btn-sm" style="margin-top:16px" onclick="resetInvite()">Send more</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOOKUP -->
+<div id="page-lookup" class="page">
+  <div class="section" style="max-width:480px">
+    <div class="section-title">Find my address</div>
+    <div class="section-sub">Address drops the morning of each event — enter your ticket code to unlock it</div>
+    <div class="alert-banner">
+      <span style="font-size:16px">📲</span>
+      <span>Ticket holders get the address automatically by email &amp; text the morning of the event. You can also look it up here anytime with your ticket code.</span>
+    </div>
+    <div class="lookup-box">
+      <div style="font-size:40px;text-align:center;margin-bottom:10px" id="lock-icon">🔒</div>
+      <div style="text-align:center;font-size:15px;font-weight:700;margin-bottom:4px" id="lookup-heading">Enter your ticket code</div>
+      <div style="text-align:center;font-size:13px;color:var(--text-muted);margin-bottom:16px" id="lookup-sub">Check your confirmation email or text</div>
+      <div id="lookup-form">
+        <div class="form-group">
+          <input class="form-input" id="ticket-code" placeholder="e.g. BJE-1234"
+            style="text-align:center;font-size:16px;letter-spacing:.08em;text-transform:uppercase;font-weight:600"
+            onkeydown="if(event.key==='Enter')lookupTicket()">
+        </div>
+        <div id="lookup-error" style="display:none;font-size:12px;color:var(--red-dark);margin-bottom:8px;padding:8px;background:var(--red-light);border-radius:var(--radius);text-align:center"></div>
+        <button class="btn-full coral" onclick="lookupTicket()">Unlock address 🔓</button>
+      </div>
+      <div id="addr-result" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="page-admin" class="page">
+  <div class="admin-wrap">
+    <div id="admin-login-screen">
+      <div class="admin-login-card">
+        <div style="font-size:42px;margin-bottom:10px">🔐</div>
+        <div style="font-size:17px;font-weight:700;margin-bottom:4px">Admin login</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Big John's backstage</div>
+        <div class="form-group">
+          <input class="form-input" id="admin-pass" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')adminLogin()">
+        </div>
+        <div id="admin-error" style="display:none;font-size:12px;color:var(--red-dark);margin-bottom:8px;padding:8px;background:var(--red-light);border-radius:var(--radius)">Wrong password. Try again.</div>
+        <button class="btn-full coral" onclick="adminLogin()">Log in</button>
+      </div>
+    </div>
+
+    <div id="admin-dashboard" style="display:none">
+      <div class="admin-header">
+        <div>
+          <div style="color:#CECBF6;font-size:15px;font-weight:700">Admin dashboard</div>
+          <div style="color:#7F77DD;font-size:12px">Big John's Events</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="background:#534AB7;color:#CECBF6;font-size:11px;padding:3px 10px;border-radius:var(--radius-pill)">Logged in</span>
+          <button onclick="adminLogout()" style="background:none;border:1px solid #534AB7;border-radius:var(--radius-pill);padding:4px 12px;font-size:11px;color:#AFA9EC;cursor:pointer;font-family:inherit">Log out</button>
+        </div>
+      </div>
+
+      <div class="admin-stat-grid">
+        <div class="admin-stat"><div class="admin-stat-num" id="as-events">0</div><div class="admin-stat-label">Events hosted</div></div>
+        <div class="admin-stat"><div class="admin-stat-num" id="as-guests">0</div><div class="admin-stat-label">Guests served</div></div>
+        <div class="admin-stat"><div class="admin-stat-num" id="as-revenue">$0</div><div class="admin-stat-label">Revenue</div></div>
+        <div class="admin-stat"><div class="admin-stat-num" id="as-notified">0</div><div class="admin-stat-label">Notified today</div></div>
+      </div>
+
+      <div class="tab-row">
+        <button class="tab purple active" onclick="adminTab('address',this)">Address release</button>
+        <button class="tab purple" onclick="adminTab('guestlists',this)">Guest lists</button>
+        <button class="tab purple" onclick="adminTab('create',this)">+ New event</button>
+      </div>
+
+      <div id="atab-address"><div id="admin-events-list"></div></div>
+      <div id="atab-guestlists" style="display:none"><div id="admin-guest-section"></div></div>
+      <div id="atab-create" style="display:none">
+        <div class="admin-card">
+          <div style="font-size:15px;font-weight:700;margin-bottom:14px">Create new event</div>
+          <div class="form-group"><label class="form-label">Event name</label><input class="form-input" id="new-title" placeholder="e.g. Summer Kickoff"></div>
+          <div class="form-group"><label class="form-label">Date &amp; time</label><input class="form-input" id="new-date" placeholder="e.g. Sat, Jun 14 · 4–9pm"></div>
+          <div class="form-group">
+            <label class="form-label">General area <span style="font-weight:400;color:var(--text-muted)">(shown publicly before day-of)</span></label>
+            <input class="form-input" id="new-area" placeholder="e.g. Henderson area">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Full address <span style="font-weight:400;color:var(--text-muted)">(kept private until you release it)</span></label>
+            <input class="form-input" id="new-addr" placeholder="e.g. 1234 Desert Oasis Blvd, Las Vegas NV">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="form-group"><label class="form-label">Ticket price ($)</label><input class="form-input" id="new-price" type="number" placeholder="25" min="1"></div>
+            <div class="form-group"><label class="form-label">Max spots</label><input class="form-input" id="new-spots" type="number" placeholder="50" min="1"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Pick an emoji</label><div class="emoji-grid" id="emoji-grid"></div></div>
+          <div id="create-error" style="display:none;font-size:12px;color:var(--red-dark);margin-bottom:8px;padding:8px;background:var(--red-light);border-radius:var(--radius)"></div>
+          <button class="btn-full green" id="create-btn" onclick="createEvent()">Create event 🎉</button>
+          <div id="create-success" style="display:none;text-align:center;padding:16px 0;animation:bounce-in .4s ease both">
+            <div style="font-size:36px;margin-bottom:8px">✅</div>
+            <div style="font-size:15px;font-weight:700" id="create-success-msg"></div>
+            <button class="btn-sm" style="margin-top:12px" onclick="resetCreateForm()">Create another</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKET MODAL -->
+<div class="modal-overlay" id="ticket-modal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()"><div id="modal-body"></div></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
