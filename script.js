@@ -475,3 +475,4 @@ let validCodes = JSON.parse(localStorage.getItem("validCodes")) || {};
   renderHome();
   populateInviteSelect();
   filterEvents('upcoming', document.querySelector('#page-events .tab'));
+  document.getElementById("create-btn").addEventListener("click", createEvent);
