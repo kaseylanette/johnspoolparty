@@ -455,7 +455,11 @@ let validCodes = JSON.parse(localStorage.getItem("validCodes")) || {};
     const newEv={id:nextId++,title,date,location:area,fullAddr:addr||'',price,available:true,upcoming:true,emoji:selectedEmoji,spots,isToday:false,addrReleased:false,notified:false,guests:[]};
     events.unshift(newEv);
     saveData();
-    renderHome(); populateInviteSelect(); renderAdminEvents(); updateStats();
+
+    renderHome(); 
+    populateInviteSelect(); 
+    renderAdminEvents(); 
+    updateStats();
     document.getElementById('create-btn').style.display='none';
     document.getElementById('create-success').style.display='block';
     document.getElementById('create-success-msg').textContent=`"${title}" is live! 🎉`;
