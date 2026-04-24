@@ -1,3 +1,7 @@
+function saveData() {
+  localStorage.setItem("events", JSON.stringify(events));
+  localStorage.setItem("validCodes", JSON.stringify(validCodes));
+}
 const ADMIN_PASSWORD = 'bigjohn365';
   const EMOJIS = ['🏊','🎉','🌅','🌊','🎶','🍹','🕶️','🎱','🌴','🏖️','🎊','🔥','🎈','🥳','⚡','🫧'];
   let selectedEmoji = '🎉';
@@ -6,8 +10,8 @@ const ADMIN_PASSWORD = 'bigjohn365';
   let inviteList = [];
   let inviteMode = 'email';
   let cart = { event: null, qty: 1 };
-  let events = [];
-  let validCodes = {};
+  let events = JSON.parse(localStorage.getItem("events")) || [];
+let validCodes = JSON.parse(localStorage.getItem("validCodes")) || {};
 
   function totalGuests() { return events.reduce((s,e)=>s+(e.guests||[]).reduce((a,g)=>a+g.tickets,0),0); }
   function totalRevenue() { return events.reduce((s,e)=>s+(e.guests||[]).reduce((a,g)=>a+g.tickets*e.price,0),0); }
@@ -135,6 +139,7 @@ const ADMIN_PASSWORD = 'bigjohn365';
       const email = document.getElementById('m-email').value||'';
       cart.event.guests.push({name,email,phone,tickets:cart.qty,code,checkedIn:false});
       validCodes[code] = {eventId:cart.event.id, name:name.split(' ')[0]};
+     saveData();
       updateStats();
       mb.innerHTML = `
         <div style="text-align:center;padding:10px 0">
@@ -328,6 +333,7 @@ const ADMIN_PASSWORD = 'bigjohn365';
     const val=document.getElementById('addr-'+id).value.trim();
     if(!val){alert('Please enter an address.');return;}
     ev.fullAddr=val;
+    saveData();
     const btn=document.getElementById('save-btn-'+id);
     btn.textContent='Saved ✓'; btn.style.color='var(--green)';
     setTimeout(()=>{btn.textContent='Save';btn.style.color='';},2000);
@@ -336,6 +342,7 @@ const ADMIN_PASSWORD = 'bigjohn365';
     const ev=events.find(e=>e.id===id);
     if(!ev.fullAddr){alert('Save a full address first before releasing.');return;}
     ev.addrReleased=true;
+    saveData();
     document.getElementById(`rel-btn-${id}`).className='release-btn released';
     document.getElementById(`rel-btn-${id}`).textContent='✅ Address is live';
     document.getElementById(`rel-btn-${id}`).onclick=null;
@@ -349,6 +356,7 @@ const ADMIN_PASSWORD = 'bigjohn365';
     const ev=events.find(e=>e.id===id);
     if(!ev.addrReleased&&!ev.isToday){if(!confirm('Address not released yet — notify anyway?'))return;}
     ev.notified=true;
+    saveData();
     const tc=(ev.guests||[]).reduce((a,g)=>a+g.tickets,0);
     notifiedTotal+=tc;
     document.getElementById('as-notified').textContent=notifiedTotal;
@@ -408,6 +416,7 @@ const ADMIN_PASSWORD = 'bigjohn365';
 
   function checkIn(evId,gi){
     const ev=events.find(e=>e.id===evId); ev.guests[gi].checkedIn=true;
+    saveData();
     const btn=document.getElementById(`ci-${evId}-${gi}`);
     btn.className='check-in-btn checked'; btn.textContent='✓ In'; btn.onclick=null;
     const row=document.getElementById(`grow-${evId}-${gi}`);
@@ -445,6 +454,7 @@ const ADMIN_PASSWORD = 'bigjohn365';
     err.style.display='none';
     const newEv={id:nextId++,title,date,location:area,fullAddr:addr||'',price,available:true,upcoming:true,emoji:selectedEmoji,spots,isToday:false,addrReleased:false,notified:false,guests:[]};
     events.unshift(newEv);
+    saveData();
     renderHome(); populateInviteSelect(); renderAdminEvents(); updateStats();
     document.getElementById('create-btn').style.display='none';
     document.getElementById('create-success').style.display='block';
