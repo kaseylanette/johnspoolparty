@@ -1,10 +1,9 @@
 async function saveEventToFirebase(eventData) {
   try {
-    await window.addDoc(
-      window.collection(window.db, "events"),
+    await window.firebaseAddDoc(
+      window.firebaseCollection(window.db, "events"),
       eventData
     );
-    
     console.log("Event saved to Firebase!");
   } catch (error) {
     console.error("Firebase error:", error);
@@ -454,47 +453,28 @@ let validCodes = JSON.parse(localStorage.getItem("validCodes")) || {};
     selectedEmoji=em;
     document.querySelectorAll('.emoji-opt').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected');
   }
-  function createEvent(){
-    const title=document.getElementById('new-title').value.trim();
-    const date=document.getElementById('new-date').value.trim();
-    const area=document.getElementById('new-area').value.trim();
-    const addr=document.getElementById('new-addr').value.trim();
-    const price=parseFloat(document.getElementById('new-price').value);
-    const spots=parseInt(document.getElementById('new-spots').value);
-    const err=document.getElementById('create-error');
-    if(!title||!date||!area||!price||!spots){err.textContent='Please fill in all required fields.';err.style.display='block';return;}
-    err.style.display='none';
-    const newEv={id:nextId++,title,date,location:area,fullAddr:addr||'',price,available:true,upcoming:true,emoji:selectedEmoji,spots,isToday:false,addrReleased:false,notified:false,guests:[]};
-    events.unshift(newEv);
-    saveData();
-    saveEventToFirebase(newEv);
-
-renderHome();
-populateInviteSelect();
-renderAdminEvents();
-updateStats();
-
-   async function saveEventToFirebase(eventData) {
-  try {
-    await window.firebaseAddDoc(
-      window.firebaseCollection(window.db, "events"),
-      eventData
-    );
-
-    console.log("Event saved to Firebase!");
-  } catch (error) {
-    console.error("Firebase error:", error);
-  }
+function createEvent(){
+  const title=document.getElementById('new-title').value.trim();
+  const date=document.getElementById('new-date').value.trim();
+  const area=document.getElementById('new-area').value.trim();
+  const addr=document.getElementById('new-addr').value.trim();
+  const price=parseFloat(document.getElementById('new-price').value);
+  const spots=parseInt(document.getElementById('new-spots').value);
+  const err=document.getElementById('create-error');
+  if(!title||!date||!area||!price||!spots){err.textContent='Please fill in all required fields.';err.style.display='block';return;}
+  err.style.display='none';
+  const newEv={id:nextId++,title,date,location:area,fullAddr:addr||'',price,available:true,upcoming:true,emoji:selectedEmoji,spots,isToday:false,addrReleased:false,notified:false,guests:[]};
+  events.unshift(newEv);
+  saveData();
+  saveEventToFirebase(newEv);
+  renderHome();
+  populateInviteSelect();
+  renderAdminEvents();
+  updateStats();
+  document.getElementById('create-btn').style.display='none';
+  document.getElementById('create-success').style.display='block';
+  document.getElementById('create-success-msg').textContent=`"${title}" is live! 🎉`;
 }
-
-    renderHome(); 
-    populateInviteSelect(); 
-    renderAdminEvents(); 
-    updateStats();
-    document.getElementById('create-btn').style.display='none';
-    document.getElementById('create-success').style.display='block';
-    document.getElementById('create-success-msg').textContent=`"${title}" is live! 🎉`;
-  }
   function resetCreateForm(){
     ['new-title','new-date','new-area','new-addr','new-price','new-spots'].forEach(id=>document.getElementById(id).value='');
     selectedEmoji='🎉'; renderEmojiGrid();
@@ -539,4 +519,4 @@ async function loadEventsFromFirebase() {
     filterEvents('upcoming', document.querySelector('#page-events .tab'));
   }
 }
-  loadEventsFromFirebase();
+window.addEventListener('load', loadEventsFromFirebase);
