@@ -1,3 +1,15 @@
+async function saveEventToFirebase(eventData) {
+  try {
+    await window.addDoc(
+      window.collection(window.db, "events"),
+      eventData
+    );
+    
+    console.log("Event saved to Firebase!");
+  } catch (error) {
+    console.error("Firebase error:", error);
+  }
+}
 function saveData() {
   localStorage.setItem("events", JSON.stringify(events));
   localStorage.setItem("validCodes", JSON.stringify(validCodes));
@@ -455,6 +467,7 @@ let validCodes = JSON.parse(localStorage.getItem("validCodes")) || {};
     const newEv={id:nextId++,title,date,location:area,fullAddr:addr||'',price,available:true,upcoming:true,emoji:selectedEmoji,spots,isToday:false,addrReleased:false,notified:false,guests:[]};
     events.unshift(newEv);
     saveData();
+    saveEventToFirebase(newEv);
 
     renderHome(); 
     populateInviteSelect(); 
