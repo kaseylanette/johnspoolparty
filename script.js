@@ -514,33 +514,24 @@ async function loadEventsFromFirebase() {
 
     let firebaseEvents = [];
 
-querySnapshot.forEach((doc) => {
-  firebaseEvents.push({
-    ...doc.data(),
-    firebaseId: doc.id
-  });
-});
+    querySnapshot.forEach((doc) => {
+      firebaseEvents.push({
+        ...doc.data(),
+        firebaseId: doc.id
+      });
+    });
 
-if (firebaseEvents.length > 0) {
-  events = firebaseEvents;
-  console.log("Loaded events from Firebase");
-} else {
-      console.log("No Firebase events found, using local storage");
-    }
+    events = firebaseEvents;
+
+    localStorage.setItem("events", JSON.stringify(events));
 
     renderHome();
     populateInviteSelect();
     filterEvents('upcoming', document.querySelector('#page-events .tab'));
 
+    console.log("Events synced from Firebase");
   } catch (error) {
-    console.error("Error loading events:", error);
-
-    // fallback to local storage
-    events = JSON.parse(localStorage.getItem("events")) || [];
-
-    renderHome();
-    populateInviteSelect();
-    filterEvents('upcoming', document.querySelector('#page-events .tab'));
+    console.error("Firebase sync error:", error);
   }
 }
-window.addEventListener('load', loadEventsFromFirebase);
+loadEventsFromFirebase();
