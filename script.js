@@ -467,7 +467,18 @@ let validCodes = JSON.parse(localStorage.getItem("validCodes")) || {};
     const newEv={id:nextId++,title,date,location:area,fullAddr:addr||'',price,available:true,upcoming:true,emoji:selectedEmoji,spots,isToday:false,addrReleased:false,notified:false,guests:[]};
     events.unshift(newEv);
     saveData();
-    saveEventToFirebase(newEv);
+   async function saveEventToFirebase(eventData) {
+  try {
+    await window.firebaseAddDoc(
+      window.firebaseCollection(window.db, "events"),
+      eventData
+    );
+
+    console.log("Event saved to Firebase!");
+  } catch (error) {
+    console.error("Firebase error:", error);
+  }
+}
 
     renderHome(); 
     populateInviteSelect(); 
