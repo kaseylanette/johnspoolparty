@@ -1,10 +1,14 @@
 async function saveEventToFirebase(eventData) {
   try {
-    await window.firebaseAddDoc(
+    const docRef = await window.firebaseAddDoc(
       window.firebaseCollection(window.db, "events"),
       eventData
     );
-    console.log("Event saved to Firebase!");
+    // Store the Firebase ID back on the local event object
+    const ev = events.find(e => e.id === eventData.id);
+    if (ev) ev.firebaseId = docRef.id;
+    saveData();
+    console.log("Event saved to Firebase with ID:", docRef.id);
   } catch (error) {
     console.error("Firebase error:", error);
   }
@@ -333,21 +337,20 @@ let validCodes = JSON.parse(localStorage.getItem("validCodes")) || {};
 
   function confirmDelete(id){ document.getElementById('confirm-'+id).style.display='block'; }
   function cancelDelete(id){ document.getElementById('confirm-'+id).style.display='none'; }
-  function deleteEvent(id){
-    Object.keys(validCodes).forEach(code=>{ if(validCodes[code].eventId===id) delete validCodes[code]; });
-    events = events.filter(e => e.id !== id);
+  function deleteEvent(id) {
+  const eventToDelete = events.find(e => e.id === id); // ← find FIRST
+  Object.keys(validCodes).forEach(code => { if(validCodes[code].eventId === id) delete validCodes[code]; });
+  events = events.filter(e => e.id !== id); // ← then remove
 
-  const eventToDelete = events.find(e => e.id === id);
-
-events = events.filter(e => e.id !== id);
-
-if (eventToDelete?.firebaseId) {
-  deleteEventFromFirebase(eventToDelete.firebaseId);
-}
-
-saveData();
-    renderAdminEvents(); renderHome(); populateInviteSelect(); updateStats();
+  if (eventToDelete?.firebaseId) {
+    deleteEventFromFirebase(eventToDelete.firebaseId);
+  } else {
+    console.warn("No firebaseId found — event may not be deleted from Firestore");
   }
+
+  saveData();
+  renderAdminEvents(); renderHome(); populateInviteSelect(); updateStats();
+}
 
   function saveAddr(id){
     const ev=events.find(e=>e.id===id);
