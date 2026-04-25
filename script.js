@@ -505,7 +505,7 @@ updateStats();
 async function loadEventsFromFirebase() {
   try {
     const querySnapshot = await window.firebaseGetDocs(
-  window.firebaseCollection(window.db, "events")
+      window.firebaseCollection(window.db, "events")
 );
 
     events = [];
