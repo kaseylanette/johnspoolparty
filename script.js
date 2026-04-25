@@ -336,6 +336,8 @@ let validCodes = JSON.parse(localStorage.getItem("validCodes")) || {};
   function deleteEvent(id){
     Object.keys(validCodes).forEach(code=>{ if(validCodes[code].eventId===id) delete validCodes[code]; });
     events = events.filter(e=>e.id!==id);
+    deleteEventFromFirebase(id);
+    saveData();
     renderAdminEvents(); renderHome(); populateInviteSelect(); updateStats();
   }
 
@@ -482,6 +484,17 @@ function createEvent(){
     document.getElementById('create-error').style.display='none';
     document.getElementById('create-btn').style.display='';
   }
+  async function deleteEventFromFirebase(eventId) {
+  try {
+    await window.firebaseDeleteDoc(
+      window.firebaseDoc(window.db, "events", eventId)
+    );
+
+    console.log("Event deleted from Firebase");
+  } catch (error) {
+    console.error("Delete error:", error);
+  }
+}
 async function loadEventsFromFirebase() {
   try {
     const querySnapshot = await window.firebaseGetDocs(

@@ -4,9 +4,10 @@ import {
   getFirestore,
   collection,
   addDoc,
-  getDocs
+  getDocs,
+  deleteDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
 const firebaseConfig = {
   apiKey: "AIzaSyD5fIIG56sZZXObFNL65f1nT0aPp_yeD_4",
   authDomain: "big-john-events-741bd.firebaseapp.com",
@@ -24,5 +25,7 @@ window.db = db;
 window.firebaseCollection = collection;
 window.firebaseAddDoc = addDoc;
 window.firebaseGetDocs = getDocs;
+window.firebaseDeleteDoc = deleteDoc;
+window.firebaseDoc = doc;
 
 console.log("Firebase connected successfully");
