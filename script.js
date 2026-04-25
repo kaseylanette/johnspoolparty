@@ -473,6 +473,30 @@ renderHome();
 populateInviteSelect();
 renderAdminEvents();
 updateStats();
+async function loadEventsFromFirebase() {
+  try {
+    const querySnapshot = await window.firebaseGetDocs(
+      window.firebaseCollection(window.db, "events")
+    );
+
+    events = [];
+
+    querySnapshot.forEach((doc) => {
+      events.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+
+    renderHome();
+    populateInviteSelect();
+    filterEvents('upcoming', document.querySelector('#page-events .tab'));
+
+    console.log("Events loaded from Firebase!");
+  } catch (error) {
+    console.error("Error loading events:", error);
+  }
+}
    async function saveEventToFirebase(eventData) {
   try {
     await window.firebaseAddDoc(
@@ -502,7 +526,5 @@ updateStats();
     document.getElementById('create-btn').style.display='';
   }
 
-  renderHome();
-  populateInviteSelect();
-  filterEvents('upcoming', document.querySelector('#page-events .tab'));
+  loadEventsFromFirebase();
   document.getElementById("create-btn").addEventListener("click", createEvent);
