@@ -26,7 +26,7 @@ const ADMIN_PASSWORD = 'bigjohn365';
   let inviteMode = 'email';
   let cart = { event: null, qty: 1 };
   let events = JSON.parse(localStorage.getItem("events")) || [];
-let validCodes = JSON.parse(localStorage.getItem("validCodes")) || {};
+  let nextId = events.length ? Math.max(...events.map(e => e.id)) + 1 : 1; //
 
   function totalGuests() { return events.reduce((s,e)=>s+(e.guests||[]).reduce((a,g)=>a+g.tickets,0),0); }
   function totalRevenue() { return events.reduce((s,e)=>s+(e.guests||[]).reduce((a,g)=>a+g.tickets*e.price,0),0); }
@@ -534,4 +534,4 @@ async function loadEventsFromFirebase() {
     console.error("Firebase sync error:", error);
   }
 }
-loadEventsFromFirebase();
+window.addEventListener('load', loadEventsFromFirebase);
