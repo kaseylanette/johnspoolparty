@@ -466,7 +466,7 @@ const ADMIN_PASSWORD = 'bigjohn365';
     selectedEmoji=em;
     document.querySelectorAll('.emoji-opt').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected');
   }
-function createEvent(){
+function submitNewEvent(){
   const title=document.getElementById('new-title').value.trim();
   const date=document.getElementById('new-date').value.trim();
   const area=document.getElementById('new-area').value.trim();
