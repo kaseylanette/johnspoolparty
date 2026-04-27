@@ -524,7 +524,7 @@ async function loadEventsFromFirebase() {
     events = firebaseEvents;
 
     localStorage.setItem("events", JSON.stringify(events));
-
+    nextId = events.length ? Math.max(...events.map(e => e.id || 0)) + 1 : 1;
     renderHome();
     populateInviteSelect();
     filterEvents('upcoming', document.querySelector('#page-events .tab'));
